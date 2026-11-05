@@ -1,5 +1,9 @@
 # Journal des versions — Arcadia
 
+## 4.15 — 5 novembre 2026
+- **The Backrooms** — l'entité va plus vite : en poursuite, elle court presque aussi vite que toi, il faut sprinter pour lui échapper ; même quand elle rôde, elle avance plus vite.
+- **The Backrooms** — on entend ses pas lourds dès qu'elle approche, même quand elle ne t'a pas encore vu : de plus en plus forts, graves et rapprochés à mesure qu'elle se rapproche.
+
 ## 4.14 — 5 novembre 2026
 - **The Backrooms** — au Level 0, les deux étages sont bien plus loin l'un de l'autre : les trous du couloir piégé sont maintenant de vrais puits de plus de 6 mètres.
   - Rater une arête, c'est une vraie chute : on tombe pendant plus d'une seconde, l'air siffle, le choc est lourd, l'image tremble et on reste sonné plus longtemps, à bout de souffle.
