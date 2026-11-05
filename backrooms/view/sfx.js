@@ -573,22 +573,53 @@ export class BackroomsSfx {
     });
   }
 
-  // Pas lourds de l'entité, spatialisés, plus forts quand elle est près
+  // Pas lourds de l'entité, spatialisés : un coup sourd très grave qui fait trembler le sol, le craquement du poids qui
+  // retombe et un grondement ; de plus en plus forts et lourds à mesure qu'elle approche (danger de 0 à 1)
   monsterStep(danger, pos) {
     if (!this.unlocked || !this.ctx) return;
     const c = this.ctx;
     const t = c.currentTime;
+    const k = Math.min(1, danger);
+    const dest = pos && typeof pos === 'object' ? this.at({ ...pos, rolloff: 0 }) : this.out;
+    const v = 0.9 + Math.random() * 0.2;
+    // l'impact : une basse qui tombe
     const osc = c.createOscillator();
     const g = c.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(75, t);
-    osc.frequency.exponentialRampToValueAtTime(30, t + 0.18);
-    g.gain.setValueAtTime(0.5 * danger, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
-    osc.connect(g);
-    g.connect(pos && typeof pos === 'object' ? this.at({ ...pos, rolloff: 0 }) : this.out);
+    osc.frequency.setValueAtTime(95 * v, t);
+    osc.frequency.exponentialRampToValueAtTime(28, t + 0.25);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.25 + 0.9 * k, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+    osc.connect(g).connect(dest);
     osc.start(t);
-    osc.stop(t + 0.22);
+    osc.stop(t + 0.34);
+    // le sol qui encaisse : un sous-grave plus long
+    const sub = c.createOscillator();
+    const sg = c.createGain();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(42, t);
+    sub.frequency.exponentialRampToValueAtTime(22, t + 0.5);
+    sg.gain.setValueAtTime(0.0001, t);
+    sg.gain.exponentialRampToValueAtTime(0.1 + 0.6 * k, t + 0.02);
+    sg.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    sub.connect(sg).connect(dest);
+    sub.start(t);
+    sub.stop(t + 0.6);
+    // le craquement : un bruit sec, filtré bas
+    const n = Math.floor(c.sampleRate * 0.14);
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.5);
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.value = 500 + 900 * k;
+    const ng = c.createGain();
+    ng.gain.value = 0.08 + 0.4 * k;
+    src.connect(f).connect(ng).connect(dest);
+    src.start(t);
   }
 
   // Coupure de courant : gros claquement du disjoncteur, le bourdonnement des néons se tait
